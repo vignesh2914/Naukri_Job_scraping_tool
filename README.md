@@ -18,21 +18,7 @@ From the database, the data is exported and saved as CSV files in two folders:
 
 Filtered Data: Contains data filtered by repeated company names.
 Job Data: Contains unfiltered job listings.
-Repository Structure
-bash
-Copy code
-.
-├── src/
-│   ├── scraper.py      # Script for scraping data using Selenium and Beautiful Soup
-│   ├── database.py     # Script for importing DataFrame to the database
-│   ├── filtered_data/     # Folder containing filtered CSV files
-│   ├── job_data/          # Folder containing unfiltered CSV files
-│   ├── main.py         # we just call all the funtion add on by stremlit package
-│   ├── requirements.txt       # Python dependencies
-├── data/
-├── README.md              # Project README file
-Getting Started
-Prerequisites
+
 Ensure you have the following installed:
 
 - Python 3.x
