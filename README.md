@@ -25,4 +25,4 @@ Ensure you have the following installed:
 - Selenium
 - Beautiful Soup 4
 - Pandas
-- SQLAlchemy (or any preferred DB library)
+- MySql (or any preferred DB library)
