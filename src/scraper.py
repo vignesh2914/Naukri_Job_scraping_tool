@@ -38,7 +38,6 @@ def make_url(job_keyword: str, location_keyword: str, index: int) -> str:
     logging.info(f"Scraping URL: {url}")
     return url
 
-
 def scrape_job_data(job_keyword: str, location_keyword: str, time_limit: int) -> List[Dict[str, str]]:
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
@@ -89,3 +88,29 @@ def scrape_job_data(job_keyword: str, location_keyword: str, time_limit: int) ->
     logging.info('Total time taken: {}'.format(final_end_time - start_time))
 
     return all_jobs
+
+def parse_job_data_from_soup(page_soup):
+    jobs = page_soup.find_all("div", class_="your_class")
+    job_data = []
+    for job in jobs:
+        job = BeautifulSoup(str(job), 'html.parser')
+        row1 = job.find('div', class_="your_class")
+        row2 = job.find('div', class_="your_class")
+        row3 = job.find('div', class_="your_class")
+        
+        job_title = row1.a.text.strip() 
+        company_name = row2.span.a.text.strip() 
+        job_details = row3.find('div', class_="your_class") 
+        location = job_details.find('span', class_="your_class").span.span.text.strip()
+        job_url_element = job.find('a', class_= "your_class")
+        url = job_url_element.get('href') if job_url_element else 'N/A'
+        if job_url_element is None:
+            logging.warning("URL not found for a job entry.")
+    
+        job_data.append({
+            "job_title": job_title,
+            "company_name": company_name,
+            "location": location,
+            "job_url": url
+        })
+    return job_data
