@@ -114,3 +114,73 @@ def parse_job_data_from_soup(page_soup):
             "job_url": url
         })
     return job_data
+
+
+
+def create_dataframe_of_job_data(job_data: List[Dict[str, str]]) -> pd.DataFrame:
+    try:
+        if job_data:
+            column_names = ["job_title", "company_name", "location","job_url"]
+            df = pd.DataFrame(job_data, columns=column_names)
+            logging.info("Data converted into dataframe")
+            return df
+        else:
+            logging.info("No job data found to create dataframe.")
+            return pd.DataFrame(columns=["job_title", "company_name", "location","job_url"])
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+
+def get_unique_companies_df(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
+    try:
+        filtered_df = df.drop_duplicates(subset=[column_name]).reset_index(drop=True)
+        logging.info("Unique company name dataframe created")
+        return filtered_df
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+
+
+def save_job_data_dataframe_to_mysql(df: pd.DataFrame) -> None:
+    try:
+        mydb = connect_to_mysql_database(host, user, password, database)
+        cursor = create_cursor_object(mydb)
+
+        utc_datetime = get_current_utc_datetime()
+        date, time = extract_utc_date_and_time(utc_datetime)
+
+        for index, row in df.iterrows():
+            sql = "INSERT INTO naukri.job_data (DATE, TIME, job_title, company_name, location, job_url) VALUES (%s,%s,%s,%s,%s,%s)"
+            values = (date, time, row['job_title'], row['company_name'], row['location'], row['job_url'])
+            cursor.execute(sql, values)
+            logging.info("Job details saved in DB successfully")
+
+        mydb.commit()
+        cursor.close()
+        mydb.close()
+        logging.info("DB closed successfully")
+    except Exception as e:
+        logging.error(f"An error occurred while saving job data to MySQL: {e}")
+        raise CustomException(f"An error occurred while saving job data to MySQL: {e}")
+
+
+def save_filtered_job_data_dataframe_to_mysql(df: pd.DataFrame) -> None:
+
+    try:
+        mydb = connect_to_mysql_database(host, user, password, database)
+        cursor = create_cursor_object(mydb)
+
+        utc_datetime = get_current_utc_datetime()
+        date, time = extract_utc_date_and_time(utc_datetime)
+
+        for index, row in df.iterrows():
+            sql = "INSERT INTO naukri.job_filtered_data (DATE, TIME, job_title, company_name, location, job_url) VALUES (%s,%s,%s,%s,%s,%s)"
+            values = (date, time, row['job_title'], row['company_name'], row['location'], row['job_url'])
+            cursor.execute(sql, values)
+            logging.info("Job details saved in DB successfully")
+
+        mydb.commit()
+        cursor.close()
+        mydb.close()
+        logging.info("DB closed successfully")
+    except Exception as e:
+        logging.error(f"An error occurred while saving job data to MySQL: {e}")
+        raise CustomException(f"An error occurred while saving job data to MySQL: {e}")
