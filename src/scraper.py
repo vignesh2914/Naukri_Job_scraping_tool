@@ -184,3 +184,52 @@ def save_filtered_job_data_dataframe_to_mysql(df: pd.DataFrame) -> None:
     except Exception as e:
         logging.error(f"An error occurred while saving job data to MySQL: {e}")
         raise CustomException(f"An error occurred while saving job data to MySQL: {e}")
+    
+
+def extract_job_data_from_DB():
+    try:
+        mydb = connect_to_mysql_database(host, user, password, database)
+        cursor = create_cursor_object(mydb)
+        
+        # Use timezone-aware datetime for threshold calculation
+        threshold_datetime = datetime.now(timezone.utc) - timedelta(seconds=20)
+        threshold_time_str = threshold_datetime.strftime("%Y-%m-%d %H:%M:%S")
+        
+        query = "SELECT * FROM naukri.job_data WHERE TIMESTAMP(CONCAT(DATE, ' ', TIME)) >= %s"
+        cursor.execute(query, (threshold_time_str,))
+        fetched_data = cursor.fetchall()
+        
+        logging.info("Data fetched successfully")
+        
+        cursor.close()
+        mydb.close()
+        logging.info("DB closed")
+        
+        return fetched_data
+    
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        raise CustomException(e, sys)
+
+   
+ 
+def save_job_data_to_csv(job_data: List):
+    try:
+        if job_data:
+            column_names = ["ID", "DATE", "TIME","job_title", "company_name", "location", "job_url"]
+            df = pd.DataFrame(job_data, columns=column_names)
+       
+            folder_name = "Job_Data"
+            os.makedirs(folder_name, exist_ok=True)
+ 
+            current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            csv_file_path = os.path.join(folder_name, f"{current_datetime}.csv")
+ 
+            df.to_csv(csv_file_path, index=False)
+            logging.info("fetched job data saved in in CSV file successfully")
+            return csv_file_path
+        else:
+            logging.info("No recent data found to save.")
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        raise CustomException(e, sys)
