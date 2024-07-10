@@ -26,3 +26,9 @@ Ensure you have the following installed:
 - Beautiful Soup 4
 - Pandas
 - MySql (or any preferred DB library)
+
+# code updation
+
+scraper.py code is fully now completed - 10-07-24
+
+main.py file is in progress - we will execute by streamlit library(creation of UI in a precise way soon !!)
