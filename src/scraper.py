@@ -233,3 +233,54 @@ def save_job_data_to_csv(job_data: List):
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         raise CustomException(e, sys)
+    
+   
+def extract_unique_job_data_from_db() -> List:
+    try:
+        mydb = connect_to_mysql_database(host, user, password, database)
+        logging.info("Connected to the MySQL database successfully.")
+       
+        cursor = create_cursor_object(mydb)
+       
+        query = "SELECT * FROM naukri.job_filtered_data WHERE TIMESTAMP(CONCAT(DATE, ' ', TIME)) >= %s"
+   
+        threshold_datetime = datetime.utcnow() - timedelta(seconds=20)
+        threshold_time_str = threshold_datetime.strftime("%Y-%m-%d %H:%M:%S")
+       
+        cursor.execute(query, (threshold_time_str,))
+       
+        fetched_filtered_data = cursor.fetchall()
+ 
+        cursor.close()
+        mydb.close()
+        logging.info("DB connection closed.")
+       
+        return fetched_filtered_data
+ 
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        raise CustomException(e, sys)
+   
+ 
+def save_unique_job_data_to_csv(unique_data: List):
+    try:
+        if unique_data:
+            column_names = ["ID", "DATE", "TIME","job_title", "company_name", "location", "job_url"]
+            df = pd.DataFrame(unique_data, columns=column_names)
+ 
+            folder_name = "Unique_Data"
+            os.makedirs(folder_name, exist_ok=True)
+ 
+            current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            csv_file_path = os.path.join(folder_name, f"{current_datetime}.csv")
+ 
+            df.to_csv(csv_file_path, index=False)
+            logging.info("unique job data saved in csv file successfully")
+            return csv_file_path
+        else:
+            logging.info("No recent filtered data found to save.")
+ 
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        raise CustomException(e, sys)
+ 
