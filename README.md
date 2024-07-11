@@ -30,5 +30,6 @@ Ensure you have the following installed:
 # code updation
 
 scraper.py code is fully now completed - 10-07-24
+main.py completed by using streamlit package - 11-07-24
 
-main.py file is in progress - we will execute by streamlit library(creation of UI in a precise way soon !!)
+API app.py WIP
