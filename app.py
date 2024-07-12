@@ -23,6 +23,16 @@ from src.Research import (
 
 app = FastAPI()
 
+class DatabaseConfig(BaseModel):
+    host: str
+    user: str
+    password: str
+    database: str = None
+
+class JobDataConfig(BaseModel):
+    job_keyword: str
+    location_keyword: str
+    time_limit: int
 
 
 @app.post("/create_database")
