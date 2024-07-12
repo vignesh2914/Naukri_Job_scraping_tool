@@ -1,7 +1,8 @@
 # Output Image
 
 ![Screenshot](https://github.com/vignesh2914/Naukri_Job_scraping_tool/blob/main/images/output.png)
-
+![Screenshot](https://github.com/vignesh2914/Naukri_Job_scraping_tool/blob/main/images/output2.png)
+![Screenshot](https://github.com/vignesh2914/Naukri_Job_scraping_tool/blob/main/images/output3.png)
 
 
 
