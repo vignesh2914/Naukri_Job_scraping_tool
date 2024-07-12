@@ -1,4 +1,3 @@
-
 # Naukri Web Scraper Project
 This project automates the process of scraping job listings from Naukri.com using Selenium and Beautiful Soup, then processes and stores the data in a structured format. Below is a detailed workflow of the project.
 
@@ -29,7 +28,7 @@ Ensure you have the following installed:
 
 # code updation
 
-scraper.py code is fully now completed - 10-07-24
+scraper.py code is fully completed - 10-07-24
 main.py completed by using streamlit package - 11-07-24
 
-API app.py WIP
+API app.py updation resumed 12-07-24
