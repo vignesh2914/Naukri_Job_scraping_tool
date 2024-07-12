@@ -9,14 +9,14 @@ from scraper import (
 
 configure()
 
-st.title("Job Data Scraper Application - Datanetiix")
+st.title("Job Data Scraper Application")
 
 job_keyword = st.text_input("Job Keyword")
 location_keyword = st.text_input("Location Keyword")
 time_limit = st.number_input("Time Limit (seconds)", min_value=1, value=60)
 
 if st.button("Submit"):
-    if job_keyword and location_keyword and time_limit > 0:
+    if job_keyword and location_keyword and time_limit > 0:                                 
         try:
             job_data = scrape_job_data(job_keyword, location_keyword, time_limit)
             
