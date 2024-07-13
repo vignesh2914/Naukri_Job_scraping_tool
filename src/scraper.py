@@ -30,36 +30,15 @@ database = os.getenv("database_name")
 
 
 def make_url(job_keyword: str, location_keyword: str, index: int) -> str:
-    formatted_job_keyword = job_keyword.replace(" ", "-")
-    formatted_location_keyword = location_keyword.replace(" ", "-")
     base_url = "https://www.naukri.com/{}-jobs-in-{}-{}"
-    url = base_url.format(formatted_job_keyword, formatted_location_keyword, index)
-
-    logging.info(f"Scraping URL: {url}")
-    return url
 
 def scrape_job_data(job_keyword: str, location_keyword: str, time_limit: int) -> List[Dict[str, str]]:
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument("--log-level=3")
     options.add_argument("--ignore-certificate-errors")
     options.add_argument("--ignore-ssl-errors")
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    
-    stealth(driver,
-            languages=["en-US", "en"],
-            vendor="Google Inc.",
-            platform="Win32",
-            webgl_vendor="Intel Inc.",
-            renderer="Intel Iris OpenGL Engine",
-            fix_hairline=True,
-    )
-    
     start_time = datetime.now()
     logging.info('Crawl starting time: {}'.format(start_time.time()))
     end_time = start_time + timedelta(seconds=time_limit)
@@ -94,16 +73,16 @@ def parse_job_data_from_soup(page_soup):
     job_data = []
     for job in jobs:
         job = BeautifulSoup(str(job), 'html.parser')
-        row1 = job.find('div', class_="your_class")
-        row2 = job.find('div', class_="your_class")
-        row3 = job.find('div', class_="your_class")
+        row1 = job.find(class_="your_class")
+        row2 = job.find(class_="your_class")
+        row3 = job.find(class_="your_class")
         
         job_title = row1.a.text.strip() 
         company_name = row2.span.a.text.strip() 
-        job_details = row3.find('div', class_="your_class") 
-        location = job_details.find('span', class_="your_class").span.span.text.strip()
-        job_url_element = job.find('a', class_= "your_class")
-        url = job_url_element.get('href') if job_url_element else 'N/A'
+        job_details = row3.find(class_="your_class") 
+        location = job_details.find(class_="your_class").span.span.text.strip()
+        job_url_element = job.find(class_= "your_class")
+        url = job_url_element.get 
         if job_url_element is None:
             logging.warning("URL not found for a job entry.")
     
@@ -167,9 +146,6 @@ def save_filtered_job_data_dataframe_to_mysql(df: pd.DataFrame) -> None:
     try:
         mydb = connect_to_mysql_database(host, user, password, database)
         cursor = create_cursor_object(mydb)
-
-        utc_datetime = get_current_utc_datetime()
-        date, time = extract_utc_date_and_time(utc_datetime)
 
         for index, row in df.iterrows():
             sql = "INSERT INTO naukri.job_filtered_data (DATE, TIME, job_title, company_name, location, job_url) VALUES (%s,%s,%s,%s,%s,%s)"
@@ -243,12 +219,7 @@ def extract_unique_job_data_from_db() -> List:
         cursor = create_cursor_object(mydb)
        
         query = "SELECT * FROM naukri.job_filtered_data WHERE TIMESTAMP(CONCAT(DATE, ' ', TIME)) >= %s"
-   
-        threshold_datetime = datetime.utcnow() - timedelta(seconds=20)
-        threshold_time_str = threshold_datetime.strftime("%Y-%m-%d %H:%M:%S")
-       
-        cursor.execute(query, (threshold_time_str,))
-       
+                 
         fetched_filtered_data = cursor.fetchall()
  
         cursor.close()
